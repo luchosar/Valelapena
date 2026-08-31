@@ -433,7 +433,44 @@
     text-transform:uppercase;
     padding:5px 10px;
     border-radius:100px;
+    z-index:5;
   }
+
+  /* ----- Visor 3D: se monta arriba de la foto y aparece con un
+     fundido cuando el modelo terminó de cargar. Si no hay modelo
+     todavía (o falla la carga), la foto de abajo sigue tal cual. ----- */
+  .viewer-mount{
+    position:absolute; inset:0;
+    z-index:3;
+    opacity:0;
+    transition:opacity .5s ease;
+    pointer-events:none;
+  }
+  .viewer-mount.is-ready{
+    opacity:1;
+    pointer-events:auto;
+    cursor:grab;
+  }
+  .viewer-mount.is-ready:active{ cursor:grabbing; }
+  .viewer-mount canvas{
+    width:100% !important;
+    height:100% !important;
+    display:block;
+  }
+  .viewer-badge{
+    position:absolute; bottom:9px; right:9px;
+    z-index:4;
+    background:var(--espresso-70);
+    color:var(--cream-2);
+    font-family:'Space Mono', monospace;
+    font-size:10px;
+    letter-spacing:.03em;
+    padding:4px 9px;
+    border-radius:100px;
+    opacity:0;
+    transition:opacity .4s ease;
+  }
+  .viewer-mount.is-ready ~ .viewer-badge{ opacity:1; }
 
   .product-body{
     padding:18px 18px 20px;
@@ -769,7 +806,7 @@
     <!-- LOGO: subí tu archivo a imagenes/logo.png (o .svg, cambiando la
          extensión acá abajo). Si no existe, se muestra el texto solo. -->
     <a href="#" class="logo-wrap" aria-label="Vale la pena — inicio">
-      <img src="logo.png" alt="Vale la pena" class="logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+      <img src="imagenes/logo.png" alt="Vale la pena" class="logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
       <div class="logo" style="display:none;">Vale <span>la pena</span></div>
     </a>
     <ul class="nav-links" id="navLinks">
@@ -958,6 +995,210 @@
   </button>
 </div>
 
+<!-- ======================================================================
+     MOTOR 3D (opcional)
+     Solo hace algo en los productos que tengan "model" cargado en la
+     lista de productos, más abajo. Cada visor se crea cuando la tarjeta
+     entra en pantalla y se destruye cuando sale, para no consumir
+     recursos de más aunque haya muchos productos con 3D a la vez.
+     ====================================================================== -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'https://unpkg.com/three@0.160.0/examples/jsm/loaders/GLTFLoader.js';
+
+const loader = new GLTFLoader();
+const modelCache = new Map();  // url del .glb -> Promise<THREE.Object3D> (así no se re-descarga al salir/entrar de pantalla)
+const instances  = new Map();  // elemento .viewer-mount -> estado de su visor activo
+
+function loadModel(url){
+  if(!modelCache.has(url)){
+    modelCache.set(url, new Promise((resolve, reject) => {
+      loader.load(url, gltf => resolve(gltf.scene), undefined, reject);
+    }));
+  }
+  return modelCache.get(url);
+}
+
+function makeShadowTexture(){
+  const c = document.createElement('canvas');
+  c.width = c.height = 128;
+  const ctx = c.getContext('2d');
+  const g = ctx.createRadialGradient(64,64,4,64,64,64);
+  g.addColorStop(0, 'rgba(43,29,18,0.35)');
+  g.addColorStop(1, 'rgba(43,29,18,0)');
+  ctx.fillStyle = g;
+  ctx.fillRect(0,0,128,128);
+  return new THREE.CanvasTexture(c);
+}
+let sharedShadowTex = null;
+
+async function mountViewer(mount){
+  if(instances.has(mount)) return;
+  const url = mount.dataset.model;
+  if(!url) return;
+
+  const state = { alive:true };
+  instances.set(mount, state);
+
+  let template;
+  try{
+    template = await loadModel(url);
+  }catch(err){
+    // No se encontró el .glb todavía (o falló la carga): no rompemos
+    // nada, la foto normal sigue mostrándose debajo.
+    instances.delete(mount);
+    return;
+  }
+  if(!state.alive) return; // la tarjeta ya salió de pantalla mientras cargaba
+
+  const width = mount.clientWidth, height = mount.clientHeight;
+  const canvas = document.createElement('canvas');
+  mount.appendChild(canvas);
+
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha:true, antialias:true, powerPreference:'low-power' });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(width, height, false);
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(32, width/height, 0.1, 100);
+  camera.position.set(0, 0.15, 3.2);
+
+  scene.add(new THREE.HemisphereLight(0xfff3e2, 0x3a2c1c, 1.1));
+  const key = new THREE.DirectionalLight(0xffffff, 1.4);
+  key.position.set(2, 3, 2);
+  scene.add(key);
+  const fillLight = new THREE.DirectionalLight(0xffcf9e, 0.5);
+  fillLight.position.set(-2, -1, 1.5);
+  scene.add(fillLight);
+
+  // El modelo se centra y se escala solo para entrar siempre igual de
+  // grande en la tarjeta, sin importar el tamaño con que lo exportó Meshy.
+  const model = template.clone(true);
+  const box = new THREE.Box3().setFromObject(model);
+  const size = box.getSize(new THREE.Vector3());
+  const center = box.getCenter(new THREE.Vector3());
+  const maxDim = Math.max(size.x, size.y, size.z) || 1;
+  const scale = 1.6 / maxDim;
+  model.scale.setScalar(scale);
+  model.position.sub(center.multiplyScalar(scale));
+
+  const pivot = new THREE.Group();
+  pivot.add(model);
+  scene.add(pivot);
+
+  if(!sharedShadowTex) sharedShadowTex = makeShadowTexture();
+  const shadow = new THREE.Mesh(
+    new THREE.PlaneGeometry(1.7, 1.7),
+    new THREE.MeshBasicMaterial({ map: sharedShadowTex, transparent:true, depthWrite:false })
+  );
+  shadow.rotation.x = -Math.PI / 2;
+  shadow.position.y = -0.62;
+  scene.add(shadow);
+
+  // Arrastrar para girar (con inercia). Cuando nadie lo toca, gira solo
+  // despacito — así siempre se ve "vivo" aunque nadie interactúe.
+  let dragging = false, lastX = 0, velocity = 0.0025;
+  let rotY = Math.random() * Math.PI * 2;
+
+  const toX = (e) => (e.touches ? e.touches[0].clientX : e.clientX);
+  const onDown = (e) => { dragging = true; lastX = toX(e); mount.classList.add('dragging'); };
+  const onMove = (e) => {
+    if(!dragging) return;
+    const x = toX(e);
+    const dx = x - lastX;
+    lastX = x;
+    rotY += dx * 0.012;
+    velocity = dx * 0.012;
+    e.preventDefault();
+  };
+  const onUp = () => { dragging = false; mount.classList.remove('dragging'); };
+
+  canvas.addEventListener('pointerdown', onDown);
+  window.addEventListener('pointermove', onMove, { passive:false });
+  window.addEventListener('pointerup', onUp);
+
+  const phase = Math.random() * Math.PI * 2;
+  const clock = new THREE.Clock();
+  let raf = null;
+
+  function tick(){
+    if(!state.alive) return;
+    raf = requestAnimationFrame(tick);
+    const t = clock.getElapsedTime();
+
+    if(!dragging){
+      if(Math.abs(velocity) > 0.0003){ rotY += velocity; velocity *= 0.94; }
+      else{ rotY += 0.0035; }
+    }
+    pivot.rotation.y = rotY;
+    pivot.position.y = Math.sin(t * 1.4 + phase) * 0.06;      // flote suave
+    shadow.material.opacity = 0.55 - Math.abs(Math.sin(t * 1.4 + phase)) * 0.25;
+
+    renderer.render(scene, camera);
+  }
+  tick();
+  mount.classList.add('is-ready');
+
+  const ro = new ResizeObserver(() => {
+    const w = mount.clientWidth, h = mount.clientHeight;
+    if(!w || !h) return;
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+  });
+  ro.observe(mount);
+
+  state.dispose = () => {
+    state.alive = false;
+    cancelAnimationFrame(raf);
+    ro.disconnect();
+    canvas.removeEventListener('pointerdown', onDown);
+    window.removeEventListener('pointermove', onMove);
+    window.removeEventListener('pointerup', onUp);
+    renderer.dispose();
+    canvas.remove();
+    mount.classList.remove('is-ready');
+    instances.delete(mount);
+  };
+}
+
+function unmountViewer(mount){
+  const state = instances.get(mount);
+  if(state && state.dispose) state.dispose();
+}
+
+// Solo existe un visor activo por tarjeta visible: se crea al entrar en
+// pantalla y se destruye (libera memoria de video) al salir.
+const viewerObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if(entry.isIntersecting) mountViewer(entry.target);
+    else unmountViewer(entry.target);
+  });
+}, { threshold: 0.15 });
+
+function observeAllViewers(){
+  document.querySelectorAll('.viewer-mount[data-model]').forEach(el => viewerObserver.observe(el));
+}
+function teardownAllViewers(){
+  instances.forEach((state) => { if(state.dispose) state.dispose(); });
+  viewerObserver.disconnect();
+}
+
+window.addEventListener('productGridClearing', teardownAllViewers);
+window.addEventListener('productGridUpdated', observeAllViewers);
+
+// El catálogo ya está dibujado en el DOM para cuando este módulo termina
+// de cargar, así que enganchamos los visores existentes de una vez.
+observeAllViewers();
+</script>
+
 <script>
   /* ============================================================
      LISTA DE PRODUCTOS
@@ -965,6 +1206,18 @@
      datos. "tags" acepta: "dulce", "salado", "vegano", "sin-tacc".
      "star:true" le pone la cinta de "producto estrella".
      El nombre de archivo de imagen va sin espacios ni tildes.
+
+     MODELOS 3D (opcional): si un producto tiene "model", en vez de
+     la foto se muestra el objeto 3D flotando y rotando cuando la
+     tarjeta entra en pantalla (se puede girar arrastrando).
+     - Exportá desde Meshy en formato .glb (un solo archivo, más
+       liviano que .obj/.fbx con texturas sueltas).
+     - Guardalo en una carpeta "modelos" junto a este archivo, con
+       el mismo nombre que uses en "model" acá abajo.
+     - Si el archivo no existe todavía, no pasa nada: se sigue
+       mostrando la foto normal.
+     - Para que cargue rápido en el celular, en Meshy exportá las
+       texturas a 2K como máximo (no hace falta más para ~1000 polígonos).
      ============================================================ */
   const PRODUCTS = [
     {
@@ -973,7 +1226,8 @@
       price: 2000,
       tags: ["dulce","vegano","sin-tacc"],
       star: true,
-      img: "barrita-simple.jpg"
+      img: "imagenes/barrita-simple.jpg",
+      model: "modelos/barrita-simple.glb"
     },
     {
       id: "barrita-chocolate",
@@ -981,7 +1235,8 @@
       price: 2500,
       tags: ["dulce","vegano","sin-tacc"],
       star: true,
-      img: "barrita-chocolate.jpg"
+      img: "imagenes/barrita-chocolate.jpg",
+      model: "modelos/barrita-chocolate.glb"
     },
     {
       id: "barrita-limon",
@@ -989,23 +1244,8 @@
       price: 2500,
       tags: ["dulce","vegano","sin-tacc"],
       star: true,
-      img: "barrita-limon.jpg"
-    },
-    {
-      id: "pepa-xl",
-      name: "Pepa XL",
-      price: 800,
-      tags: ["dulce","vegano"],
-      star: false,
-      img: "pepa-xl.jpg"
-    },
-    {
-      id: "granola-power",
-      name: "Granola Power",
-      price: 18000,
-      tags: ["dulce","vegano","sin-tacc"],
-      star: false,
-      img: "granola-power.jpg"
+      img: "imagenes/barrita-limon.jpg",
+      model: "modelos/barrita-limon.glb"
     }
   ];
 
@@ -1036,6 +1276,7 @@
 
   function renderProducts(){
     const filtered = PRODUCTS.filter(p => currentFilter === "todos" || p.tags.includes(currentFilter));
+    window.dispatchEvent(new CustomEvent("productGridClearing")); // avisa al visor 3D: soltá lo que tengas montado
     grid.innerHTML = "";
 
     if(filtered.length === 0){
@@ -1062,6 +1303,7 @@
             ${placeholderIcon()}
             <span>${p.img}</span>
           </div>
+          ${p.model ? `<div class="viewer-mount" data-model="${p.model}" data-name="${p.name}"></div><span class="viewer-badge">🔄 360°</span>` : ''}
         </div>
         <div class="product-body">
           <h3>${p.name}</h3>
@@ -1081,6 +1323,8 @@
       `;
       grid.appendChild(card);
     });
+
+    window.dispatchEvent(new CustomEvent("productGridUpdated")); // avisa al visor 3D: hay tarjetas nuevas para observar
   }
 
   function changeQty(id, delta){
