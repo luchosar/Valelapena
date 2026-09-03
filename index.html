@@ -5,34 +5,38 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vale la pena — Snacks saludables en Córdoba</title>
 <meta name="description" content="Snacks saludables hechos con ingredientes reales. Barritas de granola artesanales, entrega dentro del anillo de circunvalación en Córdoba.">
- 
+
 <!--
   ============================================================
   GUÍA RÁPIDA PARA EDITAR ESTA PÁGINA (no hace falta saber programar)
   ============================================================
-  1) FOTOS: creá una carpeta llamada "imagenes" al lado de este
-     archivo y subí ahí las fotos con estos nombres exactos:
+  1) FOTOS: subí las fotos de los productos en la MISMA carpeta que
+     este archivo (sin subcarpetas), con estos nombres exactos:
        - barrita-simple.jpg
        - barrita-chocolate.jpg
        - barrita-limon.jpg
      Si el nombre coincide, la foto aparece sola. Si falta,
      se muestra un ícono de reemplazo, así nunca se rompe la página.
- 
+
   2) PRODUCTOS NUEVOS: buscá "LISTA DE PRODUCTOS" más abajo en el
      código (dentro de la etiqueta <script>) y copiá un bloque
      como el de las barritas, cambiando id, nombre, precio y tags.
- 
-  3) HORARIOS Y ZONA: buscá "EDITAR HORARIO" y "EDITAR ZONA".
- 
-  4) COLOR Y LOGO: si tenés un logo en imagen, reemplazá el texto
-     "Vale la pena" del header por una etiqueta <img>.
+
+  3) MODELO 3D: hay un solo modelo 3D en toda la página, el que
+     flota en el sello circular del encabezado (hero). Va en la
+     misma carpeta que este archivo, buscá "producto.glb" más abajo.
+
+  4) HORARIOS Y ZONA: buscá "EDITAR HORARIO" y "EDITAR ZONA".
+
+  5) LOGO: subí tu logo a la misma carpeta, con el nombre "logo.png"
+     (o .svg, cambiando la extensión en el <img> del header).
   ============================================================
 -->
- 
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
- 
+
 <style>
   :root{
     --cream:        #FAF3E6;
@@ -52,14 +56,14 @@
     --radius-sm: 8px;
     --shadow-card: 0 10px 30px -12px rgba(43,29,18,0.25);
   }
- 
+
   *{ box-sizing:border-box; }
   html{ scroll-behavior:smooth; }
   @media (prefers-reduced-motion: reduce){
     html{ scroll-behavior:auto; }
     *{ animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; }
   }
- 
+
   body{
     margin:0;
     background:var(--cream);
@@ -68,7 +72,7 @@
     line-height:1.5;
     -webkit-font-smoothing:antialiased;
   }
- 
+
   h1,h2,h3{
     font-family:'Fraunces', serif;
     font-weight:600;
@@ -76,17 +80,17 @@
     color:var(--espresso);
     letter-spacing:-0.01em;
   }
- 
+
   a{ color:inherit; }
   button{ font-family:inherit; cursor:pointer; }
   img{ max-width:100%; display:block; }
- 
+
   .wrap{
     max-width:1140px;
     margin:0 auto;
     padding:0 24px;
   }
- 
+
   .eyebrow{
     font-family:'Space Mono', monospace;
     font-size:12px;
@@ -103,7 +107,7 @@
     background:var(--terracotta-d);
     display:inline-block;
   }
- 
+
   /* ---------- HEADER ---------- */
   header{
     position:sticky; top:0; z-index:50;
@@ -189,7 +193,7 @@
   }
   .menu-btn span::before{ position:absolute; top:-7px; }
   .menu-btn span::after{ position:absolute; top:7px; }
- 
+
   @media (max-width:800px){
     .nav-links{
       position:fixed; inset:64px 0 auto 0;
@@ -205,7 +209,7 @@
     .nav-links.open{ transform:translateY(0); }
     .menu-btn{ display:flex; }
   }
- 
+
   /* ---------- HERO ---------- */
   .hero{
     position:relative;
@@ -262,7 +266,7 @@
   .btn-primary:hover{ background:var(--terracotta-d); transform:translateY(-2px); box-shadow:0 12px 24px -10px rgba(193,101,47,0.6); }
   .btn-ghost{ background:transparent; border-color:var(--espresso); color:var(--espresso); }
   .btn-ghost:hover{ background:var(--espresso); color:var(--cream-2); }
- 
+
   /* ----- Hero visual: two deckle-edged kraft labels stacked, plus a
      circular ink-stamp — the same "paper tag" language used again,
      smaller scale, on every product card further down the page. ----- */
@@ -286,20 +290,28 @@
     box-shadow:0 18px 34px -14px rgba(43,29,18,0.35);
     display:flex; align-items:center; justify-content:center;
   }
-  .label-front svg{ width:56%; height:56%; filter:none; }
+  .label-fallback-art{ width:56%; height:56%; filter:none; }
+  /* El visor 3D vive por fuera de .label-front a propósito: si heredara
+     el filter:url(#deckle) del papel rasgado, el modelo se vería
+     "ondulado" en vez de nítido. Se superpone en el mismo lugar. */
+  .hero-visual .viewer-mount{
+    inset:6%;
+    transform:rotate(4deg);
+  }
   .ink-stamp{
     position:absolute;
     top:-8%; right:-6%;
     width:34%;
     color:var(--espresso);
     animation:stampIn .5s ease .3s both;
+    z-index:2;
   }
   @keyframes stampIn{
     from{ opacity:0; transform:scale(0.7) rotate(-14deg); }
     to{ opacity:1; transform:scale(1) rotate(-8deg); }
   }
   @media (prefers-reduced-motion: reduce){ .ink-stamp{ animation:none; transform:rotate(-8deg); } }
- 
+
   /* ----- Torn-paper divider: a jagged deckle edge, not a repeating
      geometric pattern — reuses the same SVG filter as the hero labels
      so the "torn kraft paper" motif is consistent site-wide. ----- */
@@ -309,7 +321,7 @@
     margin-top:-1px;
   }
   .torn-edge svg{ width:100%; height:100%; display:block; }
- 
+
   /* ---------- SECTION HEADINGS ---------- */
   section{ padding:88px 0; }
   .section-head{
@@ -325,7 +337,7 @@
     color:var(--espresso-70);
     font-size:16px;
   }
- 
+
   /* ---------- CATALOG ---------- */
   .catalog{ background:var(--cream-2); }
   .filters{
@@ -347,7 +359,7 @@
     color:var(--cream-2);
     border-color:var(--espresso);
   }
- 
+
   .product-grid{
     display:grid;
     grid-template-columns:repeat(auto-fill, minmax(250px, 1fr));
@@ -399,7 +411,7 @@
     border:1px solid var(--espresso-70);
     z-index:2;
   }
- 
+
   .product-photo{
     position:relative;
     aspect-ratio:4/3;
@@ -435,7 +447,7 @@
     border-radius:100px;
     z-index:5;
   }
- 
+
   /* ----- Visor 3D: se monta arriba de la foto y aparece con un
      fundido cuando el modelo terminó de cargar. Si no hay modelo
      todavía (o falla la carga), la foto de abajo sigue tal cual. ----- */
@@ -457,21 +469,7 @@
     height:100% !important;
     display:block;
   }
-  .viewer-badge{
-    position:absolute; bottom:9px; right:9px;
-    z-index:4;
-    background:var(--espresso-70);
-    color:var(--cream-2);
-    font-family:'Space Mono', monospace;
-    font-size:10px;
-    letter-spacing:.03em;
-    padding:4px 9px;
-    border-radius:100px;
-    opacity:0;
-    transition:opacity .4s ease;
-  }
-  .viewer-mount.is-ready ~ .viewer-badge{ opacity:1; }
- 
+
   .product-body{
     padding:18px 18px 20px;
     display:flex;
@@ -496,7 +494,7 @@
   }
   .tag.tag-dulce{ background:var(--terracotta); }
   .tag.tag-salado{ background:var(--espresso); }
- 
+
   .product-foot{
     margin-top:auto;
     display:flex;
@@ -542,7 +540,7 @@
   }
   .add-btn:hover{ background:var(--terracotta); }
   .add-btn.added{ background:var(--sage); }
- 
+
   .empty-state{
     grid-column:1/-1;
     text-align:center;
@@ -552,7 +550,7 @@
     border:1px dashed var(--line);
     border-radius:var(--radius-md);
   }
- 
+
   /* ---------- ABOUT / NUTRITION LIST ---------- */
   .about{
     background:var(--kraft);
@@ -569,7 +567,7 @@
     margin:0 0 16px;
   }
   .about-text p:last-child{ margin-bottom:0; }
- 
+
   .facts-card{
     background:var(--cream-2);
     border-radius:var(--radius-md);
@@ -602,7 +600,7 @@
     color:var(--espresso-70);
     text-align:right;
   }
- 
+
   /* ---------- DELIVERY / CONTACT ---------- */
   .delivery{ background:var(--cream-2); }
   .delivery-grid{
@@ -633,7 +631,7 @@
     flex-shrink:0;
   }
   .info-card .icon svg{ width:17px; height:17px; }
- 
+
   /* ---------- FOOTER ---------- */
   footer{
     background:var(--espresso);
@@ -690,7 +688,7 @@
     flex-wrap:wrap;
     gap:10px;
   }
- 
+
   /* ---------- FLOATING WHATSAPP + CART ---------- */
   .fab-wrap{
     position:fixed;
@@ -752,7 +750,7 @@
   }
   .cart-order-btn:disabled{ opacity:.5; cursor:not-allowed; }
   .cart-order-btn:not(:disabled):hover{ background:var(--sage-d); }
- 
+
   .fab-btn{
     width:60px; height:60px;
     border-radius:50%;
@@ -777,11 +775,11 @@
     border-radius:50%;
     display:flex; align-items:center; justify-content:center;
   }
- 
+
   /* reveal on scroll */
   .reveal{ opacity:0; transform:translateY(16px); transition:opacity .55s ease, transform .55s ease; }
   .reveal.in{ opacity:1; transform:none; }
- 
+
   @media (max-width:860px){
     .hero-grid{ grid-template-columns:1fr; }
     .hero-visual{ max-width:280px; margin:0 auto; }
@@ -790,7 +788,7 @@
 </style>
 </head>
 <body>
- 
+
 <!-- Filtro reutilizado para el efecto de "papel rasgado" (etiquetas del
      hero y separador de sección). No se ve directamente, solo lo usan
      otros elementos vía filter:url(#deckle). -->
@@ -800,13 +798,14 @@
     <feDisplacementMap in="SourceGraphic" in2="noise" scale="18" xChannelSelector="R" yChannelSelector="G"/>
   </filter>
 </svg>
- 
+
 <header>
   <nav class="nav">
-    <!-- LOGO: subí tu archivo a imagenes/logo.png (o .svg, cambiando la
-         extensión acá abajo). Si no existe, se muestra el texto solo. -->
+    <!-- LOGO: subí tu archivo a logo.png (misma carpeta que este
+         index.html — o .svg, cambiando la extensión acá abajo). Si no
+         existe, se muestra el texto solo. -->
     <a href="#" class="logo-wrap" aria-label="Vale la pena — inicio">
-      <img src="imagenes/logo.png" alt="Vale la pena" class="logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+      <img src="logo.png" alt="Vale la pena" class="logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
       <div class="logo" style="display:none;">Vale <span>la pena</span></div>
     </a>
     <ul class="nav-links" id="navLinks">
@@ -823,7 +822,7 @@
     <button class="menu-btn" id="menuBtn" aria-label="Abrir menú"><span></span></button>
   </nav>
 </header>
- 
+
 <section class="hero">
   <div class="hero-grid">
     <div>
@@ -844,7 +843,9 @@
     <div class="hero-visual">
       <div class="label label-back"></div>
       <div class="label label-front">
-        <svg viewBox="0 0 200 200" fill="none">
+        <!-- Se ve mientras carga el modelo 3D, o si "producto.glb"
+             todavía no existe — la página nunca se rompe. -->
+        <svg class="label-fallback-art" viewBox="0 0 200 200" fill="none">
           <ellipse cx="100" cy="105" rx="58" ry="30" fill="#C1652F"/>
           <circle cx="70" cy="95" r="5" fill="#2B1D12"/>
           <circle cx="95" cy="115" r="4" fill="#2B1D12"/>
@@ -854,6 +855,9 @@
           <circle cx="112" cy="128" r="4" fill="#2B1D12"/>
         </svg>
       </div>
+      <!-- ÚNICO modelo 3D de toda la página. Subí el archivo "producto.glb"
+           a la misma carpeta que este index.html. -->
+      <div class="viewer-mount" data-model="producto.glb" data-name="Vale la pena"></div>
       <svg class="ink-stamp" viewBox="0 0 160 160">
         <defs>
           <path id="stampCircle" d="M 80,80 m -58,0 a 58,58 0 1,1 116,0 a 58,58 0 1,1 -116,0"/>
@@ -869,13 +873,13 @@
     </div>
   </div>
 </section>
- 
+
 <div class="torn-edge">
   <svg viewBox="0 0 1200 46" preserveAspectRatio="none" filter="url(#deckle)" aria-hidden="true">
     <rect x="0" y="0" width="1200" height="46" style="fill:var(--cream-2);"/>
   </svg>
 </div>
- 
+
 <!-- ====================== CATÁLOGO ====================== -->
 <section class="catalog" id="catalogo">
   <div class="wrap">
@@ -884,7 +888,7 @@
       <h2>Nuestros productos</h2>
       <p>Elegí, sumá al pedido y lo cerrás directo por WhatsApp. Sin registros ni vueltas.</p>
     </div>
- 
+
     <div class="filters reveal">
       <button class="filter-pill active" data-filter="todos">Todos</button>
       <button class="filter-pill" data-filter="dulce">Dulce</button>
@@ -892,11 +896,11 @@
       <button class="filter-pill" data-filter="vegano">Vegano</button>
       <button class="filter-pill" data-filter="sin-tacc">Sin TACC</button>
     </div>
- 
+
     <div class="product-grid reveal" id="productGrid"></div>
   </div>
 </section>
- 
+
 <!-- ====================== NOSOTROS ====================== -->
 <section class="about" id="nosotros">
   <div class="wrap about-grid">
@@ -918,7 +922,7 @@
     </div>
   </div>
 </section>
- 
+
 <!-- ====================== ENTREGA Y CONTACTO ====================== -->
 <section class="delivery" id="contacto">
   <div class="wrap">
@@ -927,7 +931,7 @@
       <h2>Hacé tu pedido</h2>
       <p>Armás el pedido en el catálogo y lo confirmamos por WhatsApp. Así de simple.</p>
     </div>
- 
+
     <div class="delivery-grid reveal">
       <div class="info-card">
         <h3><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg></span>Zona de entrega</h3>
@@ -950,7 +954,7 @@
     </div>
   </div>
 </section>
- 
+
 <footer>
   <div class="wrap">
     <div class="footer-grid">
@@ -978,7 +982,7 @@
     </div>
   </div>
 </footer>
- 
+
 <!-- ====================== CARRITO FLOTANTE ====================== -->
 <div class="fab-wrap">
   <div class="cart-panel" id="cartPanel">
@@ -994,13 +998,13 @@
     <span class="fab-count" id="fabCount" style="display:none;">0</span>
   </button>
 </div>
- 
+
 <!-- ======================================================================
-     MOTOR 3D (opcional)
-     Solo hace algo en los productos que tengan "model" cargado en la
-     lista de productos, más abajo. Cada visor se crea cuando la tarjeta
-     entra en pantalla y se destruye cuando sale, para no consumir
-     recursos de más aunque haya muchos productos con 3D a la vez.
+     MOTOR 3D
+     Controla el único modelo 3D de la página: el que flota en el sello
+     circular del hero ("producto.glb"). Se monta cuando esa parte de la
+     página entra en pantalla y se destruye cuando sale, para no gastar
+     recursos de más si el visitante nunca llega a verlo.
      ====================================================================== -->
 <script type="importmap">
 {
@@ -1012,11 +1016,11 @@
 <script type="module">
 import * as THREE from 'three';
 import { GLTFLoader } from 'https://unpkg.com/three@0.160.0/examples/jsm/loaders/GLTFLoader.js';
- 
+
 const loader = new GLTFLoader();
 const modelCache = new Map();  // url del .glb -> Promise<THREE.Object3D> (así no se re-descarga al salir/entrar de pantalla)
 const instances  = new Map();  // elemento .viewer-mount -> estado de su visor activo
- 
+
 function loadModel(url){
   if(!modelCache.has(url)){
     modelCache.set(url, new Promise((resolve, reject) => {
@@ -1025,7 +1029,7 @@ function loadModel(url){
   }
   return modelCache.get(url);
 }
- 
+
 function makeShadowTexture(){
   const c = document.createElement('canvas');
   c.width = c.height = 128;
@@ -1038,15 +1042,15 @@ function makeShadowTexture(){
   return new THREE.CanvasTexture(c);
 }
 let sharedShadowTex = null;
- 
+
 async function mountViewer(mount){
   if(instances.has(mount)) return;
   const url = mount.dataset.model;
   if(!url) return;
- 
+
   const state = { alive:true };
   instances.set(mount, state);
- 
+
   let template;
   try{
     template = await loadModel(url);
@@ -1057,19 +1061,19 @@ async function mountViewer(mount){
     return;
   }
   if(!state.alive) return; // la tarjeta ya salió de pantalla mientras cargaba
- 
+
   const width = mount.clientWidth, height = mount.clientHeight;
   const canvas = document.createElement('canvas');
   mount.appendChild(canvas);
- 
+
   const renderer = new THREE.WebGLRenderer({ canvas, alpha:true, antialias:true, powerPreference:'low-power' });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.setSize(width, height, false);
- 
+
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(32, width/height, 0.1, 100);
   camera.position.set(0, 0.15, 3.2);
- 
+
   scene.add(new THREE.HemisphereLight(0xfff3e2, 0x3a2c1c, 1.1));
   const key = new THREE.DirectionalLight(0xffffff, 1.4);
   key.position.set(2, 3, 2);
@@ -1077,7 +1081,7 @@ async function mountViewer(mount){
   const fillLight = new THREE.DirectionalLight(0xffcf9e, 0.5);
   fillLight.position.set(-2, -1, 1.5);
   scene.add(fillLight);
- 
+
   // El modelo se centra y se escala solo para entrar siempre igual de
   // grande en la tarjeta, sin importar el tamaño con que lo exportó Meshy.
   const model = template.clone(true);
@@ -1088,11 +1092,11 @@ async function mountViewer(mount){
   const scale = 1.6 / maxDim;
   model.scale.setScalar(scale);
   model.position.sub(center.multiplyScalar(scale));
- 
+
   const pivot = new THREE.Group();
   pivot.add(model);
   scene.add(pivot);
- 
+
   if(!sharedShadowTex) sharedShadowTex = makeShadowTexture();
   const shadow = new THREE.Mesh(
     new THREE.PlaneGeometry(1.7, 1.7),
@@ -1101,12 +1105,12 @@ async function mountViewer(mount){
   shadow.rotation.x = -Math.PI / 2;
   shadow.position.y = -0.62;
   scene.add(shadow);
- 
+
   // Arrastrar para girar (con inercia). Cuando nadie lo toca, gira solo
   // despacito — así siempre se ve "vivo" aunque nadie interactúe.
   let dragging = false, lastX = 0, velocity = 0.0025;
   let rotY = Math.random() * Math.PI * 2;
- 
+
   const toX = (e) => (e.touches ? e.touches[0].clientX : e.clientX);
   const onDown = (e) => { dragging = true; lastX = toX(e); mount.classList.add('dragging'); };
   const onMove = (e) => {
@@ -1119,20 +1123,20 @@ async function mountViewer(mount){
     e.preventDefault();
   };
   const onUp = () => { dragging = false; mount.classList.remove('dragging'); };
- 
+
   canvas.addEventListener('pointerdown', onDown);
   window.addEventListener('pointermove', onMove, { passive:false });
   window.addEventListener('pointerup', onUp);
- 
+
   const phase = Math.random() * Math.PI * 2;
   const clock = new THREE.Clock();
   let raf = null;
- 
+
   function tick(){
     if(!state.alive) return;
     raf = requestAnimationFrame(tick);
     const t = clock.getElapsedTime();
- 
+
     if(!dragging){
       if(Math.abs(velocity) > 0.0003){ rotY += velocity; velocity *= 0.94; }
       else{ rotY += 0.0035; }
@@ -1140,12 +1144,12 @@ async function mountViewer(mount){
     pivot.rotation.y = rotY;
     pivot.position.y = Math.sin(t * 1.4 + phase) * 0.06;      // flote suave
     shadow.material.opacity = 0.55 - Math.abs(Math.sin(t * 1.4 + phase)) * 0.25;
- 
+
     renderer.render(scene, camera);
   }
   tick();
   mount.classList.add('is-ready');
- 
+
   const ro = new ResizeObserver(() => {
     const w = mount.clientWidth, h = mount.clientHeight;
     if(!w || !h) return;
@@ -1154,7 +1158,7 @@ async function mountViewer(mount){
     camera.updateProjectionMatrix();
   });
   ro.observe(mount);
- 
+
   state.dispose = () => {
     state.alive = false;
     cancelAnimationFrame(raf);
@@ -1168,12 +1172,12 @@ async function mountViewer(mount){
     instances.delete(mount);
   };
 }
- 
+
 function unmountViewer(mount){
   const state = instances.get(mount);
   if(state && state.dispose) state.dispose();
 }
- 
+
 // Solo existe un visor activo por tarjeta visible: se crea al entrar en
 // pantalla y se destruye (libera memoria de video) al salir.
 const viewerObserver = new IntersectionObserver((entries) => {
@@ -1182,42 +1186,27 @@ const viewerObserver = new IntersectionObserver((entries) => {
     else unmountViewer(entry.target);
   });
 }, { threshold: 0.15 });
- 
+
 function observeAllViewers(){
   document.querySelectorAll('.viewer-mount[data-model]').forEach(el => viewerObserver.observe(el));
 }
-function teardownAllViewers(){
-  instances.forEach((state) => { if(state.dispose) state.dispose(); });
-  viewerObserver.disconnect();
-}
- 
-window.addEventListener('productGridClearing', teardownAllViewers);
-window.addEventListener('productGridUpdated', observeAllViewers);
- 
-// El catálogo ya está dibujado en el DOM para cuando este módulo termina
-// de cargar, así que enganchamos los visores existentes de una vez.
+
+// Hay un solo visor 3D en toda la página (el del hero) y está siempre
+// en el DOM, así que alcanza con engancharlo una vez al cargar.
 observeAllViewers();
 </script>
- 
+
 <script>
   /* ============================================================
      LISTA DE PRODUCTOS
      Para agregar uno nuevo, copiá un bloque { ... } y cambiá los
      datos. "tags" acepta: "dulce", "salado", "vegano", "sin-tacc".
      "star:true" le pone la cinta de "producto estrella".
-     El nombre de archivo de imagen va sin espacios ni tildes.
- 
-     MODELOS 3D (opcional): si un producto tiene "model", en vez de
-     la foto se muestra el objeto 3D flotando y rotando cuando la
-     tarjeta entra en pantalla (se puede girar arrastrando).
-     - Exportá desde Meshy en formato .glb (un solo archivo, más
-       liviano que .obj/.fbx con texturas sueltas).
-     - Guardalo en una carpeta "modelos" junto a este archivo, con
-       el mismo nombre que uses en "model" acá abajo.
-     - Si el archivo no existe todavía, no pasa nada: se sigue
-       mostrando la foto normal.
-     - Para que cargue rápido en el celular, en Meshy exportá las
-       texturas a 2K como máximo (no hace falta más para ~1000 polígonos).
+     El nombre de archivo de imagen va sin espacios ni tildes, y vive
+     en la misma carpeta que este index.html (sin subcarpetas).
+
+     El modelo 3D es uno solo para toda la web y vive en el hero, no
+     acá — buscá "producto.glb" en el HTML si querés cambiar ese archivo.
      ============================================================ */
   const PRODUCTS = [
     {
@@ -1226,8 +1215,7 @@ observeAllViewers();
       price: 2000,
       tags: ["dulce","vegano","sin-tacc"],
       star: true,
-      img: "barrita-simple.jpg",
-      model: "barrita-simple.glb"
+      img: "barrita-simple.jpg"
     },
     {
       id: "barrita-chocolate",
@@ -1235,8 +1223,7 @@ observeAllViewers();
       price: 2500,
       tags: ["dulce","vegano","sin-tacc"],
       star: true,
-      img: "imagenes/barrita-chocolate.jpg",
-      model: "modelos/barrita-chocolate.glb"
+      img: "barrita-chocolate.jpg"
     },
     {
       id: "barrita-limon",
@@ -1244,28 +1231,27 @@ observeAllViewers();
       price: 2500,
       tags: ["dulce","vegano","sin-tacc"],
       star: true,
-      img: "imagenes/barrita-limon.jpg",
-      model: "modelos/barrita-limon.glb"
+      img: "barrita-limon.jpg"
     }
   ];
- 
+
   const WHATSAPP_NUMBER = "5493512760842";
   const TAG_LABELS = { "dulce":"Dulce", "salado":"Salado", "vegano":"Vegano", "sin-tacc":"Sin TACC" };
- 
+
   const cart = {}; // { productId: qty }
   let currentFilter = "todos";
- 
+
   const grid = document.getElementById("productGrid");
   const cartItemsEl = document.getElementById("cartItems");
   const cartTotalEl = document.getElementById("cartTotal");
   const cartTotalValueEl = document.getElementById("cartTotalValue");
   const orderBtn = document.getElementById("orderBtn");
   const fabCount = document.getElementById("fabCount");
- 
+
   function money(n){
     return "$" + n.toLocaleString("es-AR");
   }
- 
+
   function placeholderIcon(){
     return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
       <rect x="3" y="5" width="18" height="14" rx="2"/>
@@ -1273,17 +1259,16 @@ observeAllViewers();
       <path d="M21 16l-5.2-5.2a2 2 0 0 0-2.8 0L5 19"/>
     </svg>`;
   }
- 
+
   function renderProducts(){
     const filtered = PRODUCTS.filter(p => currentFilter === "todos" || p.tags.includes(currentFilter));
-    window.dispatchEvent(new CustomEvent("productGridClearing")); // avisa al visor 3D: soltá lo que tengas montado
     grid.innerHTML = "";
- 
+
     if(filtered.length === 0){
       grid.innerHTML = `<div class="empty-state">Todavía no hay productos en esta categoría. ¡Pronto sumamos más! 👀</div>`;
       return;
     }
- 
+
     filtered.forEach(p => {
       const qty = cart[p.id] || 0;
       const card = document.createElement("div");
@@ -1303,7 +1288,6 @@ observeAllViewers();
             ${placeholderIcon()}
             <span>${p.img}</span>
           </div>
-          ${p.model ? `<div class="viewer-mount" data-model="${p.model}" data-name="${p.name}"></div><span class="viewer-badge">🔄 360°</span>` : ''}
         </div>
         <div class="product-body">
           <h3>${p.name}</h3>
@@ -1323,25 +1307,23 @@ observeAllViewers();
       `;
       grid.appendChild(card);
     });
- 
-    window.dispatchEvent(new CustomEvent("productGridUpdated")); // avisa al visor 3D: hay tarjetas nuevas para observar
   }
- 
+
   function changeQty(id, delta){
     const next = Math.max(0, (cart[id] || 0) + delta);
     if(next === 0){ delete cart[id]; } else { cart[id] = next; }
     const qtyEl = document.querySelector(`[data-qty="${id}"]`);
     if(qtyEl) qtyEl.textContent = cart[id] || 0;
   }
- 
+
   grid.addEventListener("click", (e) => {
     const minus = e.target.closest("[data-action='minus']");
     const plus = e.target.closest("[data-action='plus']");
     const add = e.target.closest("[data-add]");
- 
+
     if(minus){ changeQty(minus.dataset.id, -1); }
     if(plus){ changeQty(plus.dataset.id, 1); }
- 
+
     if(add){
       const id = add.dataset.add;
       if(!cart[id] || cart[id] === 0){ cart[id] = 1; }
@@ -1354,7 +1336,7 @@ observeAllViewers();
       openCart();
     }
   });
- 
+
   document.querySelectorAll(".filter-pill").forEach(btn => {
     btn.addEventListener("click", () => {
       document.querySelectorAll(".filter-pill").forEach(b => b.classList.remove("active"));
@@ -1363,11 +1345,11 @@ observeAllViewers();
       renderProducts();
     });
   });
- 
+
   function renderCart(){
     const ids = Object.keys(cart);
     let total = 0;
- 
+
     if(ids.length === 0){
       cartItemsEl.innerHTML = `<p class="cart-empty">Todavía no agregaste productos.</p>`;
       cartTotalEl.style.display = "none";
@@ -1391,13 +1373,13 @@ observeAllViewers();
       cartTotalEl.style.display = "flex";
       cartTotalValueEl.textContent = money(total);
       orderBtn.disabled = false;
- 
+
       const totalQty = ids.reduce((a,id) => a + cart[id], 0);
       fabCount.style.display = "flex";
       fabCount.textContent = totalQty;
     }
   }
- 
+
   cartItemsEl.addEventListener("click", (e) => {
     const rm = e.target.closest("[data-remove]");
     if(rm){
@@ -1406,12 +1388,12 @@ observeAllViewers();
       renderCart();
     }
   });
- 
+
   function openCart(){ document.getElementById("cartPanel").classList.add("open"); }
   document.getElementById("fabBtn").addEventListener("click", () => {
     document.getElementById("cartPanel").classList.toggle("open");
   });
- 
+
   orderBtn.addEventListener("click", () => {
     const ids = Object.keys(cart);
     if(ids.length === 0) return;
@@ -1424,38 +1406,35 @@ observeAllViewers();
     });
     const msg =
 `¡Hola! Quiero hacer un pedido a Vale la pena 🌾
- 
+
 ${lines.join("\n")}
- 
+
 Total: ${money(total)}
- 
+
 Mi dirección de entrega es: [completar]
 ¿Está dentro del anillo de circunvalación? `;
- 
+
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, "_blank");
   });
- 
+
   // menú mobile
   const menuBtn = document.getElementById("menuBtn");
   const navLinks = document.getElementById("navLinks");
   menuBtn.addEventListener("click", () => navLinks.classList.toggle("open"));
   navLinks.querySelectorAll("a").forEach(a => a.addEventListener("click", () => navLinks.classList.remove("open")));
- 
+
   // scroll reveal
   const revealEls = document.querySelectorAll(".reveal");
   const io = new IntersectionObserver((entries) => {
     entries.forEach(entry => { if(entry.isIntersecting){ entry.target.classList.add("in"); io.unobserve(entry.target); } });
   }, { threshold: 0.12 });
   revealEls.forEach(el => io.observe(el));
- 
+
   document.getElementById("year").textContent = new Date().getFullYear();
- 
+
   renderProducts();
   renderCart();
 </script>
- 
-</body>
-</html>
 
 </body>
 </html>
