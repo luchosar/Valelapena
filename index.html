@@ -7,9 +7,6 @@
 <meta name="description" content="Snacks saludables hechos con ingredientes reales. Barritas de granola artesanales, entrega dentro de Córdoba.">
 
 <!--
-  ============================================================
-  GUÍA RÁPIDA PARA EDITAR ESTA PÁGINA (no hace falta saber programar)
-  ============================================================
   1) FOTOS: subí las fotos de los productos en la MISMA carpeta que
      este archivo (sin subcarpetas), con estos nombres exactos:
        - barrita-simple.jpg
@@ -30,7 +27,6 @@
 
   5) LOGO: subí tu logo a la misma carpeta, con el nombre "logo.png"
      (o .svg, cambiando la extensión en el <img> del header).
-  ============================================================
 -->
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1211,32 +1207,71 @@ observeAllViewers();
   const PRODUCTS = [
     {
       id: "barrita-simple",
-      name: "Barrita de granola simple",
+      name: "Energía Andina",
       price: 2000,
-      tags: ["dulce","vegano","sin-tacc"],
+      tags: ["proteico","low-carb"],
+      Desc: "Frutos secos, extra maní, quiona pop, pasta de maní y pasas de uva",
       star: true,
       img: "barrita-simple.jpg"
     },
     {
       id: "barrita-chocolate",
-      name: "Barrita de granola chocolate",
-      price: 2500,
-      tags: ["dulce","vegano","sin-tacc"],
+      name: "Choco Crunch",
+      price: 2000,
+      tags: ["proteico","sin-azucar"],
+      Desc: "Frutos secos, Quinoa pop, pasta de maní, Chocolate y sal marina",
       star: true,
       img: "barrita-chocolate.jpg"
     },
     {
       id: "barrita-limon",
-      name: "Barrita de granola limón",
+      name: "Choco Lemon",
       price: 2500,
-      tags: ["dulce","vegano","sin-tacc"],
+      tags: ["proteico","sin-azucar"],
+      Desc: "Frutos secos, Quinoa pop, pasta de maní, crema de limón y chocolate",
       star: true,
       img: "barrita-limon.jpg"
+    }
+    {
+      id: "barrita-berry",
+      name: "Berry",
+      price: 2500,
+      tags: ["proteico","sin-azucar"],
+      Desc: "Frutos secos, Quinoa pop, pasta de maní, reducción de frutos rojos y chocolate",
+      star: true,
+      img: "barrita-berry.jpg"
+    }
+   {
+      id: "barrita-coco",
+      name: "Coco Bliss",
+      price: 2000,
+      tags: ["proteico","sin-azucar","low-carb"],
+      Desc: "Frutos secos, Quinoa pop, pasta de maní, coco y chocolate",
+      star: true,
+      img: "barrita-coco.jpg"
+    }
+   {
+      id: "pan-proteico",
+      name: "Pan Protéico",
+      price: 6000,
+      tags: ["proteico","vegano"],
+      Desc: "950Gr. Harina integral, Proteina, Mix de semillas y Aceite de girasol",
+      star: false,
+      img: "pan-proteico.jpg"
+    }
+   {
+      id: "yogurt-natural",
+      name: "Yogurt Natural",
+      price: 3500,
+      tags: ["sin-azucar"],
+      Desc: "250Gr. Yogurt natural sin endulzar estilo griego",
+      star: false,
+      img: "yorgurt-natural.jpg"
     }
   ];
 
   const WHATSAPP_NUMBER = "5493512760842";
-  const TAG_LABELS = { "dulce":"Dulce", "salado":"Salado", "vegano":"Vegano", "sin-tacc":"Sin TACC" };
+  const TAG_LABELS = { "proteico":"Protéico", "low-carb":"Low Carb", "vegano":"Vegano", "sin-gluten":"Sin Gluten", "sin-azucar":"Sin azúcar" };
 
   const cart = {}; // { productId: qty }
   let currentFilter = "todos";
