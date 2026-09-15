@@ -491,6 +491,13 @@
   .tag.tag-dulce{ background:var(--terracotta); }
   .tag.tag-salado{ background:var(--espresso); }
 
+  .product-desc{
+    font-size:13.5px;
+    line-height:1.5;
+    color:var(--espresso-70);
+    margin:0;
+  }
+
   .product-foot{
     margin-top:auto;
     display:flex;
@@ -1231,7 +1238,7 @@ observeAllViewers();
       Desc: "Frutos secos, Quinoa pop, pasta de maní, crema de limón y chocolate",
       star: true,
       img: "barrita-limon.jpg"
-    }
+    },
     {
       id: "barrita-berry",
       name: "Berry",
@@ -1240,8 +1247,8 @@ observeAllViewers();
       Desc: "Frutos secos, Quinoa pop, pasta de maní, reducción de frutos rojos y chocolate",
       star: true,
       img: "barrita-berry.jpg"
-    }
-   {
+    },
+    {
       id: "barrita-coco",
       name: "Coco Bliss",
       price: 2000,
@@ -1249,8 +1256,8 @@ observeAllViewers();
       Desc: "Frutos secos, Quinoa pop, pasta de maní, coco y chocolate",
       star: true,
       img: "barrita-coco.jpg"
-    }
-   {
+    },
+    {
       id: "pan-proteico",
       name: "Pan Protéico",
       price: 6000,
@@ -1258,8 +1265,8 @@ observeAllViewers();
       Desc: "950Gr. Harina integral, Proteina, Mix de semillas y Aceite de girasol",
       star: false,
       img: "pan-proteico.jpg"
-    }
-   {
+    },
+    {
       id: "yogurt-natural",
       name: "Yogurt Natural",
       price: 3500,
@@ -1329,6 +1336,7 @@ observeAllViewers();
           <div class="tag-row">
             ${p.tags.map(t => `<span class="tag ${t==='dulce'?'tag-dulce':t==='salado'?'tag-salado':''}">${TAG_LABELS[t]}</span>`).join("")}
           </div>
+          <p class="product-desc">${p.Desc}</p>
           <div class="product-foot">
             <span class="price">${money(p.price)}</span>
             <div class="qty-stepper">
